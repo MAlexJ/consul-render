@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: consul-discovery
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: CONSUL_VERSION
+        value: 2.0.0
+      - key: CONSUL_NODE_NAME
+        value: render-consul
+      - key: CONSUL_DATACENTER
+        value: dc1
+      - key: CONSUL_DOMAIN
+        value: consul
+      - key: CONSUL_LOG_LEVEL
+        value: INFO
+      - key: CONSUL_BOOTSTRAP_EXPECT
+        value: "1"
+      - key: CONSUL_UI
+        value: "true"
+      - key: CONSUL_ACL_ENABLED
+        value: "true"
+      - key: CONSUL_ACL_DEFAULT_POLICY
+        value: deny
+      - key: CONSUL_ACL_INITIAL_MANAGEMENT_TOKEN
+        sync: false
