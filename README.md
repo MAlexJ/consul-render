@@ -2,13 +2,54 @@
 
 Single-node HashiCorp Consul server configured for Render Web Services.
 
-## Deploy
+## Deploy on Render.com without a Blueprint
 
 1. Push this repository to GitHub.
-2. Create a new Render Web Service from the repository, or use the `render.yaml` blueprint.
-3. Use Docker runtime and the free plan.
-4. Keep `PORT` unset unless you need to override Render's default.
-5. Store `CONSUL_ACL_INITIAL_MANAGEMENT_TOKEN` as a secret env var. A UUID from `uuidgen` is a good value.
+2. In Render, click **New +** and choose **Web Service**.
+3. Connect your GitHub account and select this repository.
+4. Select **Docker** as the runtime.
+5. Set **Dockerfile Path** to `./Dockerfile`.
+6. Choose the free plan if this is a Free Render deployment.
+7. Do not set `PORT`. Render creates it automatically and the container reads it at startup.
+8. Add one required environment variable:
+
+```text
+CONSUL_ACL_INITIAL_MANAGEMENT_TOKEN=<strong-random-token>
+```
+
+A UUID from `uuidgen` is a good value:
+
+```sh
+uuidgen
+```
+
+You can also generate a strong hex token with OpenSSL:
+
+```sh
+openssl rand -hex 32
+```
+
+9. Deploy the service.
+
+The Consul UI and HTTP API will be available through the Render service URL. Use the value from `CONSUL_ACL_INITIAL_MANAGEMENT_TOKEN` as the ACL token when logging in to the UI or calling protected API endpoints. This can be either the UUID from `uuidgen` or the hex string from `openssl rand -hex 32`.
+
+## Render health check
+
+In Render's **Advanced** settings, set **Health Check Path** to:
+
+```text
+/v1/status/leader
+```
+
+If the service is marked unhealthy because the endpoint is blocked by ACLs, try this fallback path:
+
+```text
+/v1/status/peers
+```
+
+## Optional Render Blueprint
+
+This repository also includes `render.yaml`, but it is optional. Use it only if you want to create the service from a Render Blueprint. For the normal GitHub + Docker flow in the Render UI, you can ignore it.
 
 ## Runtime env vars
 
